@@ -21,4 +21,6 @@ jobs:
         echo "Logueandose..."
         docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_TOKEN}}
     
-      # run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Construyendo la imagen
+    
+      run: docker build -t timurtwerking/calculadora .
