@@ -25,4 +25,4 @@ jobs:
       run: docker build -t ${{secrets.DOCKER_USER}}/calculadora:latest .
 
     - name: Subiendo imagen
-      run: docker push ${{secrets.DOCKER_USER}}/calculadora .
+      run: docker push ${{secrets.DOCKER_USER}}/calculadora:latest
