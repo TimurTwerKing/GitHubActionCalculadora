@@ -22,5 +22,7 @@ jobs:
         docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_TOKEN}}
     
     - name: Construyendo la imagen
-    
-      run: docker build -t timurtwerking/calculadora .
+      run: docker build -t ${{secrets.DOCKER_USER}}/calculadora:latest .
+
+    - name: Subiendo imagen
+      run: docker push ${{secrets.DOCKER_USER}}/calculadora .
