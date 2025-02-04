@@ -20,8 +20,7 @@ jobs:
         run: composer install
       
       - name: ejecutamos test de la calculadora
-        run: vendor/bin/phpunit --testdox 
-        # tests/CalculadoraTest.php
+        run: vendor/bin/phpunit --testdox tests/CalculadoraTest.php
       
     
   construir_docker:
