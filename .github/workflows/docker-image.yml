@@ -2,69 +2,82 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    tags:
+      - "*"
+  # pull_request:
+  #   branches: ["master"]
 
 jobs:
   tests:
     runs-on: ubuntu-24.04
-    steps: 
+    steps:
       - name: Hacer checkout
         uses: actions/checkout@v4
 
       - name: instalar php
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           extensions: pdo, pdo_mysql
 
       - name: instalar dependencias
         run: composer install
-      
+
       - name: ejecutamos test de la calculadora
         run: vendor/bin/phpunit --testdox tests/CalculadoraTest.php
-      
 
-  construir_docker:
-
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Loguearse en Docker
-      uses: docker/login-action@v3.3.0
-      with:
-        username: ${{secrets.DOCKER_USER}}
-        password: ${{secrets.DOCKER_TOKEN}}
-    
-    - name: Hacer checkout
-      uses: actions/checkout@v4
+      - name: Obtener tag
+        uses: olegtarasov/get-tag@v2.1.4
+        id: tagName
+        with: 
+          tagName: ${{ steps.tagName.outputs.tag }}
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      - name: Loguearse en Docker
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{secrets.DOCKER_USER}}
+          password: ${{secrets.DOCKER_TOKEN}}
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Hacer checkout
+        uses: actions/checkout@v4
+        
 
-    - name: Build and push
-      uses: docker/build-push-action@v6
-      with:
-       platforms: linux/amd64,linux/arm64
-       push: true
-       tags: ${{secrets.DOCKER_USER}}/caluladora:latest
 
-          
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{secrets.DOCKER_USER}}/caluladora:${{ steps.tagName.outputs.tag }}
+
+
+
+
+
+
+
+
+
     # - name: Loguearse en Docker
 
     #   uses: docker/login-action@v3.3.0
     #   with:
     #     username: ${{secrets.DOCKER_USER}}
     #     password: ${{secrets.DOCKER_TOKEN}}
-  
-    
+
     # - name: Construyendo la imagen
     #   run: docker build -t ${{secrets.DOCKER_USER}}/calculadora:latest .
 
     # - name: Subiendo imagen
     #   run: docker push ${{secrets.DOCKER_USER}}/calculadora:latest
-    
